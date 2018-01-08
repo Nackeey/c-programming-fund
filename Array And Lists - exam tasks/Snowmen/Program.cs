@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Snowmen
 {
@@ -10,58 +8,44 @@ namespace Snowmen
     {
         static void Main(string[] args)
         {
-            List<int> arr = Console.ReadLine().Split(' ').Select(int.Parse).ToList();
-            List<int> losers = new List<int>();
-
-            int attacker = 0;
-            int target = 0;
-            while (arr.Count > 1)
+            HashSet<int> losers = new HashSet<int>();
+            List<int> snowmen = Console.ReadLine().Split(' ').Select(int.Parse).ToList();
+            while (snowmen.Count > 1)
             {
-                for (int i = 0; i < arr.Count; i++)
+                for (int attacker = 0; attacker < snowmen.Count; attacker++)
                 {
-                    int difference = 0;
-                    attacker = i;
-                    if (arr[i] > arr.Count)
+                    if (!losers.Contains(attacker))
                     {
-                        arr[i] = arr[i] % arr.Count;
-                        target = arr[i];
-                    }
-                    else
-                    {
-                        target = arr.ElementAt(attacker);
-                    }
-                    if (losers.Contains(attacker))
-                    {
-                        continue;
-                    }
-                    difference = Math.Abs(target - attacker);
-                    if (difference == 0)
-                    {
-                        Console.WriteLine($"{attacker} performed harakiri");
-                        losers.Add(attacker);
-                        continue;
-                    }
-                    int winner = 0;
-                    int loser = 0;
-                    if (difference % 2 == 0)
-                    {
-                        winner = attacker;
-                        loser = target;
-                        losers.Add(arr.IndexOf(target));
-                    }
-                    else if (difference / 2 == 0)
-                    {
-                        winner = arr.IndexOf(target);
-                        loser = attacker;
-                        losers.Add(attacker);
-                    }
+                        int target = snowmen[attacker];
+                        target = target >= snowmen.Count ? target % snowmen.Count : target;
+                        if (attacker == target)
+                        {
+                            Console.WriteLine("{0} performed harakiri", attacker);
+                            losers.Add(attacker);
+                        }
+                        else if (Math.Abs(attacker - target) % 2 == 0)
+                        {
+                            Console.WriteLine("{0} x {1} -> {0} wins", attacker, target);
+                            losers.Add(target);
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} x {1} -> {1} wins", attacker, target);
+                            losers.Add(attacker);
+                        }
 
-                    Console.WriteLine($"{attacker} x {target} -> {winner} wins");
+                        if (snowmen.Count - losers.Count == 1)
+                        {
+                            return;
+                        }
+                    }
                 }
-                for (int i = 0; i < losers.Count; i++)
+                foreach (var index in losers)
                 {
-                    arr.RemoveAt(losers[i]);
+                    snowmen[index] = -1;
                 }
+                losers.Clear();
+                snowmen = snowmen.Where(x => x != -1).ToList();
             }
         }
     }
